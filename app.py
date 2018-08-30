@@ -9,15 +9,17 @@ app.config.from_object('config')
 
 
 def get_currency():
-    result = get('https://www.cbr-xml-daily.ru/daily_utf8.xml')
-    html = result.content
-    soup = BeautifulSoup(html, 'lxml')
-    text = soup.find("valute", id="R01235")
     try:
+        result = get('https://www.cbr-xml-daily.ru/daily_utf8.xml')
+        html = result.content
+        soup = BeautifulSoup(html, 'lxml')
+        text = soup.find("valute", id="R01235")
         rate = float(text.find("value").get_text().replace(',', '.'))
         return rate
-    except AttributeError:
-        print("Could not receive data from Rambler Finance")
+    except ConnectionError:
+        print("CBR server did not response. Please, try again later")
+    except (AttributeError, TypeError):
+        print("Could not receive data from CBR")
 
 
 @app.route('/')
